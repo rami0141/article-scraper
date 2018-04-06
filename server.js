@@ -23,17 +23,20 @@ app.set("view engine", "handlebars");
 // Use morgan logger for logging requests
 app.use(logger("dev"));
 // Use body-parser for handling form submissions
-app.use(bodyParser.urlencoded({ extended: true }));
-// Use express.static to serve the public folder as a static directory
-app.use(express.static("public"));
 
-// By default mongoose uses callbacks for async queries, we're setting it to use promises (.then syntax) instead
+// Require routes file pass router object
+require("./config/routes")(router);
+
+// If deployed, use the deployed database. Otherwise use the local mongoHeadlines database
+var MONGODB_URI = process.env.MONGODB_URI || "mongodb://localhost/mongoHeadlines";
 // Connect to the Mongo DB
-MONGOOSE.PROMISE = PROMISE;
-MONGOOSE.CONNECT("MONGODB://LOCALHOST/WEEK18POPULATER", {
-  USEMONGOCLIENT: TRUE
+mongoose.Promise = Promise;
+mongoose.connect("mongodb://localhost/hackernews", 
+{
+  // useMongoClient: true
 });
 
+require("./routes/index.js")(app);
 // Start the server
 app.listen(PORT, function() {
   console.log("App running on port " + PORT + "!");
